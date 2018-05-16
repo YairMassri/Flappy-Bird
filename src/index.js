@@ -1,6 +1,8 @@
 import {Bird, Pipe, Environment} from "./entities";
 
-window.onload = function () {
+window.onload = initializeGame;
+
+function initializeGame() {
     const c = document.getElementById('canvas');
     c.width = window.innerWidth;
     c.height = 600;
@@ -41,9 +43,9 @@ window.onload = function () {
         console.log("pipes ", pipes);
 
         if (detectCollisions(bird, pipes, c)) {
-            alert("you lose!");
+            drawGameOver(ctx, c);
             bird.dead = true;
-            window.location = '/';
+            
         }
 
         if (!bird.dead){
@@ -62,11 +64,11 @@ function generateRandomPipes(ctx, canvasWidth, canvasHeight){
     returnVal.top = new Pipe(canvasWidth, -5, lengthTop, 4, ctx);
     returnVal.bottom = new Pipe(canvasWidth, canvasHeight+5-lengthBottom, lengthBottom, 4, ctx);
     return returnVal;
-  }
+}
 
 function detectCollisions(bird, pipes, c) {
     
-    if(bird.Y > c.height){
+    if(bird.Y > c.height || bird.Y < 0){
        return true;
     }
 
@@ -92,3 +94,39 @@ function detectCollisions(bird, pipes, c) {
     }
     return false;
 }
+
+function drawGameOver(ctx, c){
+    ctx.font="30px Verdana";
+    ctx.textAlign="center";
+    ctx.fillText("Game Over!!", c.width/2 , c.height/2);
+
+    var btn = document.createElement('button');
+    btn.innerHTML = "Click To Try Again";
+
+    btn.style.width = "300px";
+    btn.style.height = "20px";
+    btn.style.top = 0;
+    btn.style.right = 0;
+    btn.style.bottom = 0;
+    btn.style.left = 0;
+    btn.style.margin = "auto";
+    btn.style.position = "fixed";
+
+    btn.onclick = restart;
+
+    document.body.appendChild(btn);
+    document.addEventListener('keyup', restartkey);
+
+    function restartkey (e) {
+        if (e.keyCode === 32) {
+            restart();
+        }
+    }
+    
+    function restart (e){
+        initializeGame();
+        btn.remove();
+        document.removeEventListener('keyup', restartkey);
+    }
+}
+
